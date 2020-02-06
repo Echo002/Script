@@ -16,7 +16,7 @@ Vocanlo Plot：
 '''
 
 # Read *.xlsx file
-import os
+import os 
 import numpy as np
 import pandas as pd
 from openpyxl import load_workbook
@@ -255,19 +255,19 @@ def genVolcanoplot():
 
 def calcpearsonr():
     print("helloWorld")
-    # plot = XYplot(t)
-    # for gender in range(len(gender_CN)):
-    #     for catagory_c in range(len(catagory1)):
-    #         want2write = []
-    #         for count_protein in range(4, len(t_head)):
-    #             listAge = list(t.loc[(t['gender'] == gender_CN[gender]) & (t['catagory'] == catagory1[catagory_c]), t_head[3]])
-    #             listFeature = list(t.loc[(t['gender'] == gender_CN[gender]) & (t['catagory'] == catagory1[catagory_c]), t_head[count_protein]])
-    #             # print(listAge)
-    #             # print(listFeature)
-    #             # exit()
-    #             want2write.append(calc_corr(listAge, listFeature))
-    #         plot.WriteSheet(want2write, r'Pearsonr.xlsx', catagory1[catagory_c]+gender_CN[gender])
-    # deleteSheet('Pearsonr.xlsx', 'Sheet1')
+    plot = XYplot(t)
+    for gender in range(len(gender_CN)):
+        for catagory_c in range(len(catagory1)):
+            want2write = []
+            for count_protein in range(4, len(t_head)):
+                listAge = list(t.loc[(t['gender'] == gender_CN[gender]) & (t['catagory'] == catagory1[catagory_c]), t_head[3]])
+                listFeature = list(t.loc[(t['gender'] == gender_CN[gender]) & (t['catagory'] == catagory1[catagory_c]), t_head[count_protein]])
+                # print(listAge)
+                # print(listFeature)
+                # exit()
+                want2write.append(calc_corr(listAge, listFeature))
+            plot.WriteSheet(want2write, r'Pearsonr.xlsx', catagory1[catagory_c]+gender_CN[gender])
+    deleteSheet('Pearsonr.xlsx', 'Sheet1')
 
 
 calcpearsonr()
