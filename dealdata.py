@@ -54,19 +54,19 @@ class BeeSwarmPlot:
         '''
         r = []
         # 50
-        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] < 50) & (t['catagory'] == 'control'), t_head[count_protein]]))
-        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] < 50) & (t['catagory'] == 'tumor'), t_head[count_protein]]))
-        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] < 50) & (t['catagory'] == 'cancer'), t_head[count_protein]]))
+        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] < 50) & (t['catagory'] == 'control'), self.t_head[count_protein]]))
+        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] < 50) & (t['catagory'] == 'tumor'), self.t_head[count_protein]]))
+        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] < 50) & (t['catagory'] == 'cancer'), self.t_head[count_protein]]))
 
         # 60
-        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] > 50) & (t['age'] < 70) & (t['catagory'] == 'control'), t_head[count_protein]]))
-        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] > 50) & (t['age'] < 70) & (t['catagory'] == 'tumor'), t_head[count_protein]]))
-        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] > 50) & (t['age'] < 70) & (t['catagory'] == 'cancer'), t_head[count_protein]]))
+        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] > 50) & (t['age'] < 70) & (t['catagory'] == 'control'), self.t_head[count_protein]]))
+        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] > 50) & (t['age'] < 70) & (t['catagory'] == 'tumor'), self.t_head[count_protein]]))
+        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] > 50) & (t['age'] < 70) & (t['catagory'] == 'cancer'), self.t_head[count_protein]]))
 
         # 70
-        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] > 70) & (t['catagory'] == 'control'), t_head[count_protein]]))
-        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] > 70) & (t['catagory'] == 'tumor'), t_head[count_protein]]))
-        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] > 70) & (t['catagory'] == 'cancer'), t_head[count_protein]]))
+        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] > 70) & (t['catagory'] == 'control'), self.t_head[count_protein]]))
+        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] > 70) & (t['catagory'] == 'tumor'), self.t_head[count_protein]]))
+        r.append(list(t.loc[(t['gender'] == gender) & (t['age'] > 70) & (t['catagory'] == 'cancer'), self.t_head[count_protein]]))
         return r
 
     def WriteSheet(self, ListTotal, ExcelPatch, SheetName):
@@ -92,6 +92,7 @@ class BeeSwarmPlot:
 class XYplot:
     def __init__(self, t):
         self.t = t
+        self.t_head = t.columns
 
     def gen_protein_class(self, count_protein, cata):
         '''
@@ -101,7 +102,7 @@ class XYplot:
         '''
         r = []
         r.append(list(t.loc[(t['catagory'] == catagory[cata]), 'age']))
-        r.append(list(t.loc[(t['catagory'] == catagory[cata]), t_head[count_protein]]))
+        r.append(list(t.loc[(t['catagory'] == catagory[cata]), self.t_head[count_protein]]))
         return r
 
     def WriteSheet(self, ListTotal, ExcelPatch, SheetName):
@@ -132,19 +133,20 @@ class XYplot:
 class Vocanloplot:
     def __init__(self, t):
         self.t = t
+        self.t_head = t.columns
 
     def calculate_param(self, gender, count_protein):
         '''
         :param gender:gender class
         :return: a list include control/tumor/cancer + 50/60/70
         '''
-        control_list = list(t.loc[(t['gender'] == gender) & (t['catagory'] == 'control'), t_head[count_protein]])
+        control_list = list(t.loc[(t['gender'] == gender) & (t['catagory'] == 'control'), self.t_head[count_protein]])
         control_mediam = np.nanmedian(control_list)
 
-        tumor_list = list(t.loc[(t['gender'] == gender) & (t['catagory'] == 'tumor'), t_head[count_protein]])
+        tumor_list = list(t.loc[(t['gender'] == gender) & (t['catagory'] == 'tumor'), self.t_head[count_protein]])
         tumor_mediam = np.nanmedian(tumor_list)
 
-        cancer_list = list(t.loc[(t['gender'] == gender) & (t['catagory'] == 'cancer'), t_head[count_protein]])
+        cancer_list = list(t.loc[(t['gender'] == gender) & (t['catagory'] == 'cancer'), self.t_head[count_protein]])
         cancer_mediam = np.nanmedian(cancer_list)
 
         FC_CT = control_mediam / tumor_mediam
@@ -252,19 +254,20 @@ def genVolcanoplot():
 
 
 def calcpearsonr():
-    plot = XYplot(t)
-    for gender in range(len(gender_CN)):
-        for catagory_c in range(len(catagory1)):
-            want2write = []
-            for count_protein in range(4, len(t_head)):
-                listAge = list(t.loc[(t['gender'] == gender_CN[gender]) & (t['catagory'] == catagory1[catagory_c]), t_head[3]])
-                listFeature = list(t.loc[(t['gender'] == gender_CN[gender]) & (t['catagory'] == catagory1[catagory_c]), t_head[count_protein]])
-                # print(listAge)
-                # print(listFeature)
-                # exit()
-                want2write.append(calc_corr(listAge, listFeature))
-            plot.WriteSheet(want2write, r'Pearsonr.xlsx', catagory1[catagory_c]+gender_CN[gender])
-    deleteSheet('Pearsonr.xlsx', 'Sheet1')
+    print("helloWorld")
+    # plot = XYplot(t)
+    # for gender in range(len(gender_CN)):
+    #     for catagory_c in range(len(catagory1)):
+    #         want2write = []
+    #         for count_protein in range(4, len(t_head)):
+    #             listAge = list(t.loc[(t['gender'] == gender_CN[gender]) & (t['catagory'] == catagory1[catagory_c]), t_head[3]])
+    #             listFeature = list(t.loc[(t['gender'] == gender_CN[gender]) & (t['catagory'] == catagory1[catagory_c]), t_head[count_protein]])
+    #             # print(listAge)
+    #             # print(listFeature)
+    #             # exit()
+    #             want2write.append(calc_corr(listAge, listFeature))
+    #         plot.WriteSheet(want2write, r'Pearsonr.xlsx', catagory1[catagory_c]+gender_CN[gender])
+    # deleteSheet('Pearsonr.xlsx', 'Sheet1')
 
 
 calcpearsonr()
