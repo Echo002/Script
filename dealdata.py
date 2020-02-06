@@ -16,7 +16,7 @@ Vocanlo Plot：
 '''
 
 # Read *.xlsx file
-import os 
+import os
 import numpy as np
 import pandas as pd
 from openpyxl import load_workbook
