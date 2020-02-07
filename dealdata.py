@@ -19,6 +19,7 @@ import math
 # Read *.xlsx file
 import os
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from openpyxl import load_workbook
@@ -26,7 +27,7 @@ from scipy import stats
 from scipy.stats import pearsonr
 
 try:
-    t = pd.DataFrame(pd.read_excel('d-all.xlsx'))  # header = 1 表示从第一行开始
+    t = pd.DataFrame(pd.read_excel('.\inputFile\d-all.xlsx'))  # header = 1 表示从第一行开始
 except FileNotFoundError:
     print("File not exist！")
     exit()
@@ -191,7 +192,7 @@ class Vocanloplot:
         excelWriter.close()
 
 # function set
-
+# def drawXYplot(Xlabel, Ylabel, ):
 
 def calc_corr(a, b):
     a_avg = sum(a) / len(a)
@@ -284,8 +285,15 @@ def calcpearsonr():
     deleteSheet(r'Pearsonr17_pos.xlsx', 'Sheet1')
 
 
+
 # calcpearsonr()
 # print(t.head(0))
 # print(len(t_head))
 
 # genXYplot()
+
+# y = np.nanmedian(list(t.loc[(t['age'] >= median_age) & (t['age'] < median_age + 10) & (t['catagory'] == 'control'), self.t_head[count_protein]]))
+x = [5, 15, 25, 35, 45, 55, 65, 75, 85, 95]
+plt.plot(x, y, 'ro')
+plt.axis([0, 6, 0, 20])
+plt.show()
