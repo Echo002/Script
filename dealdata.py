@@ -15,15 +15,15 @@ Vocanlo Plot：
     table head：FC、-log10(T-test)
 '''
 
+import math
 # Read *.xlsx file
 import os
-import math
+
 import numpy as np
 import pandas as pd
 from openpyxl import load_workbook
 from scipy import stats
 from scipy.stats import pearsonr
-
 
 try:
     t = pd.DataFrame(pd.read_excel('d-all.xlsx'))  # header = 1 表示从第一行开始
