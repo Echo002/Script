@@ -4,5 +4,6 @@
     "python.linting.enabled": true,
     "python.linting.pylintEnabled": true,
     "python.linting.pylintUseMinimalCheckers": true,
-    "workbench.settings.editor": "json"
+    "workbench.settings.editor": "ui",
+    "files.autoSaveDelay": 500
 }
