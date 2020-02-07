@@ -17,15 +17,16 @@ Vocanlo Plot：
 
 # Read *.xlsx file
 import os
+import math
 import numpy as np
 import pandas as pd
 from openpyxl import load_workbook
 from scipy import stats
-import math
 from scipy.stats import pearsonr
 
+
 try:
-    t = pd.DataFrame(pd.read_excel('demoDataSet1.xlsx'))  # header = 1 表示从第一行开始
+    t = pd.DataFrame(pd.read_excel('d-all.xlsx'))  # header = 1 表示从第一行开始
 except FileNotFoundError:
     print("File not exist！")
     exit()
@@ -93,6 +94,17 @@ class XYplot:
     def __init__(self, t):
         self.t = t
         self.t_head = t.columns
+
+
+    def gen_protein_via_age(self, count_protein, median_age):
+        # 在原有的xyplot基础上，将年龄细分（5一档, 10一档）
+        r = []
+        # median_age = list(t.loc[(t['age'] > median_age) & (t['age'] < median_age + 5), self.t_head[2]])
+        # median_age = np.median(median_age)
+        r.append(np.nanmedian(list(t.loc[(t['age'] >= median_age) & (t['age'] < median_age + 10) & (t['catagory'] == 'control'), self.t_head[count_protein]])))
+        r.append(np.nanmedian(list(t.loc[(t['age'] >= median_age) & (t['age'] < median_age + 10) & (t['catagory'] == 'tumor'), self.t_head[count_protein]])))
+        r.append(np.nanmedian(list(t.loc[(t['age'] >= median_age) & (t['age'] < median_age + 10) & (t['catagory'] == 'cancer'), self.t_head[count_protein]])))
+        return r
 
     def gen_protein_class(self, count_protein, cata):
         '''
@@ -214,12 +226,15 @@ def genBeeSwarm():
 
 def genXYplot():
     plot = XYplot(t)
-    catagory = ['control', 'tumor', 'cancer']
+    # catagory = ['control', 'tumor', 'cancer']
     for count_protein in range(4, len(t_head)):
         for class_cata in range(3):
-            eData = plot.gen_protein_class(count_protein, class_cata)
-            plot.WriteSheet(eData, r'XYplot.xlsx', t_head[count_protein] + ' ' + catagory[class_cata])
-    deleteSheet(r'XYplot.xlsx', 'Sheet1')
+            eData = []
+            for median_age in range(0, 100, 10):
+                eData.append(plot.gen_protein_via_age(count_protein, median_age))
+                # eData = plot.gen_protein_class(count_protein, class_cata)
+        plot.WriteSheet(eData, r'XYplot_411.xlsx', t_head[count_protein])
+    deleteSheet(r'XYplot_411.xlsx', 'Sheet1')
 
 
 def genVolcanoplot():
@@ -254,7 +269,6 @@ def genVolcanoplot():
 
 
 def calcpearsonr():
-    print("helloWorld")
     plot = XYplot(t)
     for gender in range(len(gender_CN)):
         for catagory_c in range(len(catagory1)):
@@ -266,10 +280,16 @@ def calcpearsonr():
                 # print(listFeature)
                 # exit()
                 want2write.append(calc_corr(listAge, listFeature))
-            plot.WriteSheet(want2write, r'Pearsonr.xlsx', catagory1[catagory_c]+gender_CN[gender])
-    deleteSheet('Pearsonr.xlsx', 'Sheet1')
+            plot.WriteSheet(want2write, r'Pearsonr17_pos.xlsx', catagory1[catagory_c]+gender_CN[gender])
+    deleteSheet(r'Pearsonr17_pos.xlsx', 'Sheet1')
 
 
-calcpearsonr()
-
+# calcpearsonr()
+# print(t.head(0))
 # print(len(t_head))
+
+# genXYplot()
+p = list(t.loc[(t['age'] >= 20) & (t['age'] < 30) & (t['catagory'] == 'control'), t_head[4]])
+print(np.median(p))
+print(p)
+print(len(p))
