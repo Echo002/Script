@@ -289,7 +289,3 @@ def calcpearsonr():
 # print(len(t_head))
 
 # genXYplot()
-p = list(t.loc[(t['age'] >= 20) & (t['age'] < 30) & (t['catagory'] == 'control'), t_head[4]])
-print(np.median(p))
-print(p)
-print(len(p))
