@@ -96,15 +96,11 @@ class XYplot:
         self.t = t
         self.t_head = t.columns
 
-
-    def gen_protein_via_age(self, count_protein, median_age):
+    def gen_protein_via_age(self, count_protein, median_age, cata):
         # 在原有的xyplot基础上，将年龄细分（5一档, 10一档）
-        r = []
         # median_age = list(t.loc[(t['age'] > median_age) & (t['age'] < median_age + 5), self.t_head[2]])
         # median_age = np.median(median_age)
-        r.append(np.nanmedian(list(t.loc[(t['age'] >= median_age) & (t['age'] < median_age + 10) & (t['catagory'] == 'control'), self.t_head[count_protein]])))
-        r.append(np.nanmedian(list(t.loc[(t['age'] >= median_age) & (t['age'] < median_age + 10) & (t['catagory'] == 'tumor'), self.t_head[count_protein]])))
-        r.append(np.nanmedian(list(t.loc[(t['age'] >= median_age) & (t['age'] < median_age + 10) & (t['catagory'] == 'cancer'), self.t_head[count_protein]])))
+        r = np.nanmedian(list(t.loc[(t['age'] >= median_age) & (t['age'] < median_age + 10) & (t['catagory'] == catagory[cata]), self.t_head[count_protein]]))
         return r
 
     def gen_protein_class(self, count_protein, cata):
@@ -227,15 +223,18 @@ def genBeeSwarm():
 
 def genXYplot():
     plot = XYplot(t)
+    rData = []
     # catagory = ['control', 'tumor', 'cancer']
     for count_protein in range(4, len(t_head)):
         for class_cata in range(3):
             eData = []
             for median_age in range(0, 100, 10):
-                eData.append(plot.gen_protein_via_age(count_protein, median_age))
+                eData.append(plot.gen_protein_via_age(count_protein, median_age, class_cata))
                 # eData = plot.gen_protein_class(count_protein, class_cata)
-        plot.WriteSheet(eData, r'XYplot_411.xlsx', t_head[count_protein])
-    deleteSheet(r'XYplot_411.xlsx', 'Sheet1')
+            rData.append(eData)
+        # plot.WriteSheet(eData, r'XYplot_411.xlsx', t_head[count_protein])
+    # deleteSheet(r'XYplot_411.xlsx', 'Sheet1')
+    return rData
 
 
 def genVolcanoplot():
@@ -294,6 +293,25 @@ def calcpearsonr():
 
 # y = np.nanmedian(list(t.loc[(t['age'] >= median_age) & (t['age'] < median_age + 10) & (t['catagory'] == 'control'), self.t_head[count_protein]]))
 x = [5, 15, 25, 35, 45, 55, 65, 75, 85, 95]
-plt.plot(x, y, 'ro')
-plt.axis([0, 6, 0, 20])
-plt.show()
+# plt.axis([0, 6, 0, 20])
+# plt.show()
+result = genXYplot()
+# print(result)
+# print(len(result))
+
+# font1 = {'family':'Times New Roman', 'weight':'normal', 'size':23}
+
+for count in range(len(result)):
+    ax = plt.gca()
+    # 去除右边和上面的边框
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    # 调整粗细
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    ax.spines['bottom'].set_linewidth(3);###设置底部坐标轴的粗细
+    ax.spines['left'].set_linewidth(3);####设置左边坐标轴的粗细
+    plt.plot(x, result[count], 'ro')
+    plt.savefig(r"savepic\sample" + str(count) + ".png")
+    plt.clf()
+    exit()
