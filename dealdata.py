@@ -20,6 +20,7 @@ import math
 import os
 
 import matplotlib.pyplot as plt
+from matplotlib.pyplot import MultipleLocator
 import numpy as np
 import pandas as pd
 from openpyxl import load_workbook
@@ -231,6 +232,7 @@ def genXYplot():
             for median_age in range(0, 100, 10):
                 eData.append(plot.gen_protein_via_age(count_protein, median_age, class_cata))
                 # eData = plot.gen_protein_class(count_protein, class_cata)
+                # gender-protein-catagory
             rData.append(eData)
         # plot.WriteSheet(eData, r'XYplot_411.xlsx', t_head[count_protein])
     # deleteSheet(r'XYplot_411.xlsx', 'Sheet1')
@@ -292,26 +294,76 @@ def calcpearsonr():
 # genXYplot()
 
 # y = np.nanmedian(list(t.loc[(t['age'] >= median_age) & (t['age'] < median_age + 10) & (t['catagory'] == 'control'), self.t_head[count_protein]]))
-x = [5, 15, 25, 35, 45, 55, 65, 75, 85, 95]
+def genXtrick(xmin, xmax, gap):
+    if(gap > (xmax-xmin) or xmin > xmax):
+        print("parameter error in genXtrick function")
+        return[]
+    return [i for i in np.arange(xmin + gap/2, xmax, gap)]
+
+def findMaxnMin(Lista):
+    # Lista 是一个二级列表
+    minlist = []
+    maxlist = []
+    Rminlist = []
+    Rmaxlist = []
+    for i in Lista:
+        minlist.append(np.nanmin(i))
+        maxlist.append(np.nanmax(i))
+    maxlist = [maxlist[i:i + 3] for i in range(0, len(maxlist), 3)]
+    minlist = [minlist[i:i + 3] for i in range(0, len(minlist), 3)]
+    print(maxlist)
+    for i in maxlist:
+        Rmaxlist.append(np.nanmax(i))
+    for j in minlist:
+        Rminlist.append(np.nanmin(j))
+    return [Rminlist, Rmaxlist]
+
+
+#     pass
+
+def drawplot(data, catagoryList, proteinList, Yrange):
+    x_major_locator = MultipleLocator(10)
+    # gender-protein-catagory
+    count = 0
+    while count < len(data):
+        for pro in range(len(proteinList)):
+            for cata in range(len(catagory)):
+                ax = plt.gca()
+
+                # 设置刻度及范围
+                plt.xlim(0, 100)
+                ax.xaxis.set_major_locator(x_major_locator)
+                plt.ylim(Yrange[0][count//3], Yrange[1][count//3])
+
+                # 去除右边和上面的边框
+                ax.spines['top'].set_visible(False)
+                ax.spines['right'].set_visible(False)
+
+                # 调整粗细
+                plt.xticks(fontsize=14)
+                plt.yticks(fontsize=14)
+                ax.spines['bottom'].set_linewidth(2)    ###设置底部坐标轴的粗细
+                ax.spines['left'].set_linewidth(2)      ####设置左边坐标轴的粗细
+                plt.plot(genXtrick(0, 100, 10), data[count], 'ro')
+                plt.savefig(r"savepic/" + str(proteinList[pro]) + '-' + str(catagoryList[cata]) + '.png')
+                plt.clf()
+                count += 1
+
+result = genXYplot()
+print(result)
+Yrange = findMaxnMin(result)
+print(Yrange)
+# drawplot(result, catagory, t_head[4:], Yrange)
+
+# 测试绘图
 # plt.axis([0, 6, 0, 20])
 # plt.show()
-result = genXYplot()
+
+# 测试输出的数据
+# result = genXYplot()
 # print(result)
 # print(len(result))
+# print(findMaxnMin(result))
 
+# print(genXtrick(0, 100, 5))
 # font1 = {'family':'Times New Roman', 'weight':'normal', 'size':23}
-
-for count in range(len(result)):
-    ax = plt.gca()
-    # 去除右边和上面的边框
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    # 调整粗细
-    plt.xticks(fontsize=14)
-    plt.yticks(fontsize=14)
-    ax.spines['bottom'].set_linewidth(3);###设置底部坐标轴的粗细
-    ax.spines['left'].set_linewidth(3);####设置左边坐标轴的粗细
-    plt.plot(x, result[count], 'ro')
-    plt.savefig(r"savepic\sample" + str(count) + ".png")
-    plt.clf()
-    exit()
