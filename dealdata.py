@@ -27,8 +27,10 @@ from openpyxl import load_workbook
 from scipy import stats
 from scipy.stats import pearsonr
 
+input_name = r'.\inputFile\HUA.xlsx'
+output_name =r'XYplot_HUA.xlsx'
 try:
-    t = pd.DataFrame(pd.read_excel('.\inputFile\d-all.xlsx'))  # header = 1 表示从第一行开始
+    t = pd.DataFrame(pd.read_excel(input_name))  # header = 1 表示从第一行开始
 except FileNotFoundError:
     print("File not exist！")
     exit()
@@ -36,8 +38,8 @@ except FileNotFoundError:
 # paramter set
 
 t_head = t.columns
-catagory = ['control', 'tumor', 'cancer']
-catagory1 = ['Control', 'Case']
+catagory = ['control', 'case']
+# catagory1 = ['control', 'tumor', 'cancer']
 gender = [0, 1]
 gender_CN = ['男', '女']
 
@@ -97,12 +99,21 @@ class XYplot:
         self.t = t
         self.t_head = t.columns
 
-    def gen_protein_via_age(self, count_protein, median_age, cata):
+    def gen_protein_median(self, count_protein, median_age, cata, wscale):
         # 在原有的xyplot基础上，将年龄细分（5一档, 10一档）
         # median_age = list(t.loc[(t['age'] > median_age) & (t['age'] < median_age + 5), self.t_head[2]])
         # median_age = np.median(median_age)
-        r = np.nanmedian(list(t.loc[(t['age'] >= median_age) & (t['age'] < median_age + 10) & (t['catagory'] == catagory[cata]), self.t_head[count_protein]]))
+        r = np.nanmedian(list(t.loc[(t['age'] >= median_age) & (t['age'] < median_age + wscale) & (t['catagory'] == catagory[cata]), self.t_head[count_protein]]))
         return r
+
+    def gen_protein_median_gender(self, count_protein, median_age, cata, wscale):
+        # 分男女
+        # median_age = list(t.loc[(t['age'] > median_age) & (t['age'] < median_age + 5), self.t_head[2]])
+        # median_age = np.median(median_age)
+        # 先男再女
+        r1 = np.nanmedian(list(t.loc[(t['age'] >= median_age) & (t['age'] < median_age + wscale) & (t['gender'] == 0) & (t['catagory'] == catagory[cata]), self.t_head[count_protein]]))
+        r2 = np.nanmedian(list(t.loc[(t['age'] >= median_age) & (t['age'] < median_age + wscale) & (t['gender'] == 1) & (t['catagory'] == catagory[cata]), self.t_head[count_protein]]))
+        return [r1, r2]
 
     def gen_protein_class(self, count_protein, cata):
         '''
@@ -222,20 +233,36 @@ def genBeeSwarm():
     deleteSheet(r'BeeSwarm.xlsx', 'Sheet1')
 
 
-def genXYplot():
+def genXYplot(wgender, wscale):
     plot = XYplot(t)
     rData = []
-    # catagory = ['control', 'tumor', 'cancer']
-    for count_protein in range(4, len(t_head)):
-        for class_cata in range(3):
+    if wgender == 0:
+        # catagory = ['control', 'tumor', 'cancer']
+        for count_protein in range(4, len(t_head)):
+            for class_cata in range(len(catagory)):
+                eData = []
+                for median_age in range(0, 100, wscale):
+                    eData.append(plot.gen_protein_median(count_protein, median_age, class_cata, wscale))
+                    # eData = plot.gen_protein_class(count_protein, class_cata)
+                    # gender-protein-catagory
+                rData.append(eData)
+            plot.WriteSheet(eData, output_name, t_head[count_protein])
+    if wgender == 1:
+        for count_protein in range(4, len(t_head)):
             eData = []
-            for median_age in range(0, 100, 10):
-                eData.append(plot.gen_protein_via_age(count_protein, median_age, class_cata))
-                # eData = plot.gen_protein_class(count_protein, class_cata)
-                # gender-protein-catagory
-            rData.append(eData)
-        # plot.WriteSheet(eData, r'XYplot_411.xlsx', t_head[count_protein])
-    # deleteSheet(r'XYplot_411.xlsx', 'Sheet1')
+            for class_cata in range(len(catagory)):
+                for median_age in range(0, 100, wscale):
+                    eData.append(plot.gen_protein_median_gender(count_protein, median_age, class_cata, wscale))
+                    # eData = plot.gen_protein_class(count_protein, class_cata)
+                    # gender-protein-catagory
+                # print(eData)
+                # exit()
+                rData.append(eData)
+                plot.WriteSheet(eData, output_name, t_head[count_protein] + catagory[class_cata])
+    deleteSheet(output_name, 'Sheet1')
+    # print(rData)
+    # print(len(rData))
+    # exit()
     return rData
 
 
@@ -269,29 +296,20 @@ def genVolcanoplot():
     plot.WriteSheet(fm, r'Volcanoplot.xlsx', 'female')
     deleteSheet(r'Volcanoplot.xlsx', 'Sheet1')
 
-
 def calcpearsonr():
     plot = XYplot(t)
     for gender in range(len(gender_CN)):
-        for catagory_c in range(len(catagory1)):
+        for catagory_c in range(len(catagory)):
             want2write = []
             for count_protein in range(4, len(t_head)):
-                listAge = list(t.loc[(t['gender'] == gender_CN[gender]) & (t['catagory'] == catagory1[catagory_c]), t_head[3]])
-                listFeature = list(t.loc[(t['gender'] == gender_CN[gender]) & (t['catagory'] == catagory1[catagory_c]), t_head[count_protein]])
+                listAge = list(t.loc[(t['gender'] == gender_CN[gender]) & (t['catagory'] == catagory[catagory_c]), t_head[3]])
+                listFeature = list(t.loc[(t['gender'] == gender_CN[gender]) & (t['catagory'] == catagory[catagory_c]), t_head[count_protein]])
                 # print(listAge)
                 # print(listFeature)
                 # exit()
                 want2write.append(calc_corr(listAge, listFeature))
-            plot.WriteSheet(want2write, r'Pearsonr17_pos.xlsx', catagory1[catagory_c]+gender_CN[gender])
+            plot.WriteSheet(want2write, r'Pearsonr17_pos.xlsx', catagory[catagory_c]+gender_CN[gender])
     deleteSheet(r'Pearsonr17_pos.xlsx', 'Sheet1')
-
-
-
-# calcpearsonr()
-# print(t.head(0))
-# print(len(t_head))
-
-# genXYplot()
 
 # y = np.nanmedian(list(t.loc[(t['age'] >= median_age) & (t['age'] < median_age + 10) & (t['catagory'] == 'control'), self.t_head[count_protein]]))
 def genXtrick(xmin, xmax, gap):
@@ -300,7 +318,7 @@ def genXtrick(xmin, xmax, gap):
         return[]
     return [i for i in np.arange(xmin + gap/2, xmax, gap)]
 
-def findMaxnMin(Lista):
+def findMaxnMin(Lista, lencatago):
     # Lista 是一个二级列表
     minlist = []
     maxlist = []
@@ -309,31 +327,33 @@ def findMaxnMin(Lista):
     for i in Lista:
         minlist.append(np.nanmin(i))
         maxlist.append(np.nanmax(i))
-    maxlist = [maxlist[i:i + 3] for i in range(0, len(maxlist), 3)]
-    minlist = [minlist[i:i + 3] for i in range(0, len(minlist), 3)]
-    print(maxlist)
+    maxlist = [maxlist[i:i + lencatago] for i in range(0, len(maxlist), lencatago)]
+    minlist = [minlist[i:i + lencatago] for i in range(0, len(minlist), lencatago)]
+    # print(maxlist)
     for i in maxlist:
         Rmaxlist.append(np.nanmax(i))
     for j in minlist:
         Rminlist.append(np.nanmin(j))
     return [Rminlist, Rmaxlist]
 
-
-#     pass
-
-def drawplot(data, catagoryList, proteinList, Yrange):
+def drawplot(data, catagoryList, proteinList, Yrange, lencatago, wscale):
     x_major_locator = MultipleLocator(10)
     # gender-protein-catagory
     count = 0
     while count < len(data):
         for pro in range(len(proteinList)):
             for cata in range(len(catagory)):
+                np.random.seed(1234)
                 ax = plt.gca()
 
                 # 设置刻度及范围
                 plt.xlim(0, 100)
                 ax.xaxis.set_major_locator(x_major_locator)
-                plt.ylim(Yrange[0][count//3], Yrange[1][count//3])
+                if np.isnan(Yrange[0][count//3]):
+                    plt.clf()
+                    count += 1
+                    continue
+                plt.ylim(Yrange[0][count//lencatago] - 3 * np.random.random(), Yrange[1][count//lencatago] + 3 * np.random.random())
 
                 # 去除右边和上面的边框
                 ax.spines['top'].set_visible(False)
@@ -344,26 +364,14 @@ def drawplot(data, catagoryList, proteinList, Yrange):
                 plt.yticks(fontsize=14)
                 ax.spines['bottom'].set_linewidth(2)    ###设置底部坐标轴的粗细
                 ax.spines['left'].set_linewidth(2)      ####设置左边坐标轴的粗细
-                plt.plot(genXtrick(0, 100, 10), data[count], 'ro')
+                plt.plot(genXtrick(0, 100, wscale), data[count], 'ro')
                 plt.savefig(r"savepic/" + str(proteinList[pro]) + '-' + str(catagoryList[cata]) + '.png')
                 plt.clf()
                 count += 1
 
-result = genXYplot()
-print(result)
-Yrange = findMaxnMin(result)
-print(Yrange)
-# drawplot(result, catagory, t_head[4:], Yrange)
-
-# 测试绘图
-# plt.axis([0, 6, 0, 20])
-# plt.show()
-
-# 测试输出的数据
-# result = genXYplot()
-# print(result)
-# print(len(result))
-# print(findMaxnMin(result))
-
-# print(genXtrick(0, 100, 5))
-# font1 = {'family':'Times New Roman', 'weight':'normal', 'size':23}
+wscale = 10
+wgender = 1
+result = genXYplot(wgender, wscale)
+# genXYplot()
+# Yrange = findMaxnMin(result, len(catagory))
+# drawplot(result, catagory, t_head[4:], Yrange, len(catagory), wscale)
