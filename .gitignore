@@ -21,3 +21,8 @@ HUA_sex_10.xlsx
 HUA_unsex_5.xlsx
 HUA_unsex_10.xlsx
 inputFile/HUA.xlsx
+inputFile/ELISA.xlsx
+outputFile/ELISA_sex_5.xlsx
+outputFile/ELISA_sex_10.xlsx
+outputFile/ELISA_unsex_5.xlsx
+outputFile/ELISA_unsex_10.xlsx
