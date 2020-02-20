@@ -27,8 +27,8 @@ from openpyxl import load_workbook
 from scipy import stats
 from scipy.stats import pearsonr
 
-input_name = r'.\inputFile\ELISA.xlsx'
-output_name = r'XYplot_ELISA.xlsx'
+input_name = r'.\inputFile\VIP.xlsx'
+output_name = r'XYplot_VIP.xlsx'
 try:
     t = pd.DataFrame(pd.read_excel(input_name))  # header = 1 表示从第一行开始
 except FileNotFoundError:
@@ -39,7 +39,7 @@ except FileNotFoundError:
 
 t_head = t.columns
 # catagory = ['control', 'case']
-catagory = ['control', 'tumor', 'cancer']
+catagory = ['control']
 gender = [0, 1]
 gender_CN = ['男', '女']
 
@@ -246,7 +246,7 @@ def genXYplot(wgender, wscale):
                     # eData = plot.gen_protein_class(count_protein, class_cata)
                     # gender-protein-catagory
                 rData.append(eData)
-            plot.WriteSheet(eData, output_name, t_head[count_protein])
+                plot.WriteSheet(eData, output_name, t_head[count_protein])
     if wgender == 1:
         for count_protein in range(4, len(t_head)):
             eData = []
@@ -369,8 +369,8 @@ def drawplot(data, catagoryList, proteinList, Yrange, lencatago, wscale):
                 plt.clf()
                 count += 1
 
-wscale = 10
-wgender = 0
+wscale = 5
+wgender = 1
 result = genXYplot(wgender, wscale)
 # genXYplot()
 # Yrange = findMaxnMin(result, len(catagory))

@@ -27,3 +27,10 @@ outputFile/ELISA_sex_10.xlsx
 outputFile/ELISA_unsex_5.xlsx
 outputFile/ELISA_unsex_10.xlsx
 .vscode/settings.json
+inputFile/VIP.xlsx
+outputFile/VIP_sex_5.xlsx
+outputFile/VIP_sex_10.xlsx
+outputFile/VIP_unsex_5.xlsx
+outputFile/VIP_unsex_10.xlsx
+demo.py
+demo.py
