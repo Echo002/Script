@@ -24,8 +24,8 @@ from openpyxl import load_workbook
 from scipy import stats
 from scipy.stats import pearsonr
 
-output_fileName = 'T2D2_unsex.xlsx'
-input_fileName = 'inputFile\T2D2.xlsx'
+output_fileName = 'outputFile\VIP_sex.xlsx'
+input_fileName = 'inputFile\VIP.xlsx'
 
 try:
     t = pd.DataFrame(pd.read_excel(input_fileName))  # header = 1 表示从第一行开始
@@ -36,8 +36,9 @@ except FileNotFoundError:
 # paramter set
 
 t_head = t.columns
-catagory = ['control', 'tumor', 'cancer']
-catagory1 = ['Control', 'Case']
+catagory2 = ['control', 'tumor', 'cancer']
+catagory1 = ['control', 'case']
+catagory = ['control']
 gender = [0, 1]
 gender_CN = ['男', '女']
 
@@ -118,6 +119,17 @@ class XYplot:
         r = []
         r.append(list(t.loc[(t['catagory'] == catagory[cata]), 'age']))
         r.append(list(t.loc[(t['catagory'] == catagory[cata]), self.t_head[count_protein]]))
+        return r
+
+    def gen_protein_class_via_gender(self, count_protein, cata, gender):
+        '''
+        :param count_protein: what kind of protein you want
+        :param cata: one of "control, tumor and cancer"
+        :return: a list include age + protein
+        '''
+        r = []
+        r.append(list(t.loc[(t['catagory'] == catagory[cata]) & (t['gender'] == gender), 'age']))
+        r.append(list(t.loc[(t['catagory'] == catagory[cata]) & (t['gender'] == gender), self.t_head[count_protein]]))
         return r
 
     def WriteSheet(self, ListTotal, ExcelPatch, SheetName):
@@ -232,9 +244,14 @@ def genXYplot():
     # catagory = ['control', 'tumor', 'cancer']
     for count_protein in range(4, len(t_head)):
         eData = []
-        for class_cata in range(3):
-            eData = plot.gen_protein_class(count_protein, class_cata)
-            plot.WriteSheet(eData, output_fileName, t_head[count_protein])
+        for class_cata in range(len(catagory)):
+            # eData = plot.gen_protein_class(count_protein, class_cata)
+            for gen in gender:
+                eData = plot.gen_protein_class_via_gender(count_protein, class_cata, gen)
+                # print(gen, catagory[class_cata], count_protein)
+                # print(eData)
+                # exit()
+                plot.WriteSheet(eData, output_fileName, t_head[count_protein] + gender_CN[gen])
     deleteSheet(output_fileName, 'Sheet1')
 
 
