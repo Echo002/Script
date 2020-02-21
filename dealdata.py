@@ -24,9 +24,11 @@ from openpyxl import load_workbook
 from scipy import stats
 from scipy.stats import pearsonr
 
+output_fileName = 'T2D2_unsex.xlsx'
+input_fileName = 'inputFile\T2D2.xlsx'
 
 try:
-    t = pd.DataFrame(pd.read_excel('d-all.xlsx'))  # header = 1 表示从第一行开始
+    t = pd.DataFrame(pd.read_excel(input_fileName))  # header = 1 表示从第一行开始
 except FileNotFoundError:
     print("File not exist！")
     exit()
@@ -38,6 +40,7 @@ catagory = ['control', 'tumor', 'cancer']
 catagory1 = ['Control', 'Case']
 gender = [0, 1]
 gender_CN = ['男', '女']
+
 
 # class set
 
@@ -228,13 +231,11 @@ def genXYplot():
     plot = XYplot(t)
     # catagory = ['control', 'tumor', 'cancer']
     for count_protein in range(4, len(t_head)):
+        eData = []
         for class_cata in range(3):
-            eData = []
-            for median_age in range(0, 100, 10):
-                eData.append(plot.gen_protein_via_age(count_protein, median_age))
-                # eData = plot.gen_protein_class(count_protein, class_cata)
-        plot.WriteSheet(eData, r'XYplot_411.xlsx', t_head[count_protein])
-    deleteSheet(r'XYplot_411.xlsx', 'Sheet1')
+            eData = plot.gen_protein_class(count_protein, class_cata)
+            plot.WriteSheet(eData, output_fileName, t_head[count_protein])
+    deleteSheet(output_fileName, 'Sheet1')
 
 
 def genVolcanoplot():
@@ -289,7 +290,9 @@ def calcpearsonr():
 # print(len(t_head))
 
 # genXYplot()
-p = list(t.loc[(t['age'] >= 20) & (t['age'] < 30) & (t['catagory'] == 'control'), t_head[4]])
-print(np.median(p))
-print(p)
-print(len(p))
+# p = list(t.loc[(t['age'] >= 20) & (t['age'] < 30) & (t['catagory'] == 'control'), t_head[4]])
+# print(np.median(p))
+# print(p)
+# print(len(p))
+
+genXYplot()
