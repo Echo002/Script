@@ -1,6 +1,7 @@
 demoDataSet.xlsx
 DemoDataset1.xlsx
 Pearsonr.xlsx
+<<<<<<< HEAD
 19neg.xlsx
 19pos.xlsx
 Pearsonr19_neg.xlsx
@@ -11,3 +12,13 @@ Pearsonr17_pos.xlsx
 XYplot_411.xlsx
 /outputFile
 /inputFile
+=======
+17pos.xlsx
+19neg.xlsx
+19pos.xlsx
+d-all.xlsx
+Pearsonr17_pos.xlsx
+Pearsonr19_neg.xlsx
+Pearsonr19_pos.xlsx
+XYplot_411.xlsx
+>>>>>>> 6a69bf7e4b1cb751624f3cd005375addcd84f577
