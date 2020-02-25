@@ -27,8 +27,8 @@ from openpyxl import load_workbook
 from scipy import stats
 from scipy.stats import pearsonr
 
-input_name = r'.\inputFile\T2D2.xlsx'
-output_name = r'T2D2.xlsx'
+input_name = r'.\inputFile\411ALL.xlsx'
+output_name = r'411ALL.xlsx'
 try:
     t = pd.DataFrame(pd.read_excel(input_name))  # header = 1 表示从第一行开始
 except FileNotFoundError:
@@ -370,7 +370,7 @@ def drawplot(data, catagoryList, proteinList, Yrange, lencatago, wscale):
                 count += 1
 
 wscale = 10
-wgender = 1
+wgender = 0
 result = genXYplot(wgender, wscale)
 # genXYplot()
 # Yrange = findMaxnMin(result, len(catagory))
