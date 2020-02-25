@@ -24,8 +24,8 @@ from openpyxl import load_workbook
 from scipy import stats
 from scipy.stats import pearsonr
 
-output_fileName = 'outputFile\VIP_sex.xlsx'
-input_fileName = 'inputFile\VIP.xlsx'
+output_fileName = 'indu.xlsx'
+input_fileName = 'inputFile\indu.xlsx'
 
 try:
     t = pd.DataFrame(pd.read_excel(input_fileName))  # header = 1 表示从第一行开始
@@ -245,13 +245,14 @@ def genXYplot():
     for count_protein in range(4, len(t_head)):
         eData = []
         for class_cata in range(len(catagory)):
-            # eData = plot.gen_protein_class(count_protein, class_cata)
-            for gen in gender:
-                eData = plot.gen_protein_class_via_gender(count_protein, class_cata, gen)
-                # print(gen, catagory[class_cata], count_protein)
-                # print(eData)
-                # exit()
-                plot.WriteSheet(eData, output_fileName, t_head[count_protein] + gender_CN[gen])
+            eData = plot.gen_protein_class(count_protein, class_cata)
+            # for gen in gender:
+            #     eData = plot.gen_protein_class_via_gender(count_protein, class_cata, gen)
+            #     # print(gen, catagory[class_cata], count_protein)
+            #     # print(eData)
+            #     # exit()
+            # plot.WriteSheet(eData, output_fileName, t_head[count_protein] + gender_CN[gen])
+            plot.WriteSheet(eData, output_fileName, t_head[count_protein])
     deleteSheet(output_fileName, 'Sheet1')
 
 
