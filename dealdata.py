@@ -27,8 +27,8 @@ from openpyxl import load_workbook
 from scipy import stats
 from scipy.stats import pearsonr
 
-input_name = r'.\inputFile\411ALL.xlsx'
-output_name = r'411ALL.xlsx'
+input_name = r'.\inputFile\Results Summary for CKD.xlsx'
+output_name = r'.\onputFile\result.xlsx'
 try:
     t = pd.DataFrame(pd.read_excel(input_name))  # header = 1 表示从第一行开始
 except FileNotFoundError:
@@ -38,8 +38,8 @@ except FileNotFoundError:
 # paramter set
 
 t_head = t.columns
-# catagory = ['control', 'case']
-catagory = ['control', 'tumor', 'cancer']
+catagory = ['control', 'case']
+# catagory = ['control', 'tumor', 'cancer']
 gender = [0, 1]
 gender_CN = ['男', '女']
 
@@ -162,23 +162,28 @@ class Vocanloplot:
         :return: a list include control/tumor/cancer + 50/60/70
         '''
         control_list = list(t.loc[(t['gender'] == gender) & (t['catagory'] == 'control'), self.t_head[count_protein]])
+        print(len(control_list))
         control_mediam = np.nanmedian(control_list)
 
-        tumor_list = list(t.loc[(t['gender'] == gender) & (t['catagory'] == 'tumor'), self.t_head[count_protein]])
+        tumor_list = list(t.loc[(t['gender'] == gender) & (t['catagory'] == 'case'), self.t_head[count_protein]])
+        print(len(tumor_list))
         tumor_mediam = np.nanmedian(tumor_list)
 
-        cancer_list = list(t.loc[(t['gender'] == gender) & (t['catagory'] == 'cancer'), self.t_head[count_protein]])
-        cancer_mediam = np.nanmedian(cancer_list)
+        # cancer_list = list(t.loc[(t['gender'] == gender) & (t['catagory'] == 'cancer'), self.t_head[count_protein]])
+        # cancer_mediam = np.nanmedian(cancer_list)
 
         FC_CT = control_mediam / tumor_mediam
-        FC_CC = control_mediam / cancer_mediam
+
+        print(FC_CT)
+        exit()
+        # FC_CC = control_mediam / cancer_mediam
 
         T_test_CT = list(stats.ttest_ind(control_list, tumor_list, nan_policy='omit'))
-        T_test_CC = list(stats.ttest_ind(control_list, cancer_list, nan_policy='omit'))
+        # T_test_CC = list(stats.ttest_ind(control_list, cancer_list, nan_policy='omit'))
         T_test_CT[1] = - math.log(T_test_CT[1], 10)
-        T_test_CC[1] = - math.log(T_test_CC[1], 10)
+        # T_test_CC[1] = - math.log(T_test_CC[1], 10)
 
-        return [FC_CT, FC_CC, T_test_CT[1], T_test_CC[1]]
+        return [FC_CT, T_test_CT[1]]
 
     def WriteSheet(self, ListTotal, ExcelPatch, SheetName):
         '''
@@ -212,7 +217,6 @@ def calc_corr(a, b):
     corr_factor = cov_ab / sq
     return corr_factor
 
-
 def deleteSheet(ExcelName, SheetName):
     try:
         wb = load_workbook(ExcelName)
@@ -223,7 +227,6 @@ def deleteSheet(ExcelName, SheetName):
         print("sheet not exist！")
         exit()
 
-
 def genBeeSwarm():
     plot = BeeSwarmPlot(t)
     for gender in range(2):
@@ -231,7 +234,6 @@ def genBeeSwarm():
             eData = plot.gen_protein_class(gender, count_protein)
             plot.WriteSheet(eData, r'BeeSwarm.xlsx', str(gender) + ' ' + t_head[count_protein])
     deleteSheet(r'BeeSwarm.xlsx', 'Sheet1')
-
 
 def genXYplot(wgender, wscale):
     plot = XYplot(t)
@@ -265,7 +267,6 @@ def genXYplot(wgender, wscale):
     # exit()
     return rData
 
-
 def genVolcanoplot():
     each_protein_list = []
     plot = Vocanloplot(t)
@@ -279,8 +280,8 @@ def genVolcanoplot():
     for i in range(4, len(t_head)):
         xct_plot.append(each_protein_list[i-4][0])
         xcc_plot.append(each_protein_list[i-4][1])
-        yct_plot.append(each_protein_list[i-4][2])
-        ycc_plot.append(each_protein_list[i-4][3])
+        # yct_plot.append(each_protein_list[i-4][2])
+        # ycc_plot.append(each_protein_list[i-4][3])
     m = [xct_plot, yct_plot, xcc_plot, ycc_plot]
     xct_plot = []
     yct_plot = []
@@ -289,8 +290,8 @@ def genVolcanoplot():
     for i in range(int((len(t_head)-4)/2), len(t_head)):
         xct_plot.append(each_protein_list[i-4][0])
         xcc_plot.append(each_protein_list[i-4][1])
-        yct_plot.append(each_protein_list[i-4][2])
-        ycc_plot.append(each_protein_list[i-4][3])
+        # yct_plot.append(each_protein_list[i-4][2])
+        # ycc_plot.append(each_protein_list[i-4][3])
     fm = [xct_plot, yct_plot, xcc_plot, ycc_plot]
     plot.WriteSheet(m, r'Volcanoplot.xlsx', 'male')
     plot.WriteSheet(fm, r'Volcanoplot.xlsx', 'female')
@@ -369,9 +370,13 @@ def drawplot(data, catagoryList, proteinList, Yrange, lencatago, wscale):
                 plt.clf()
                 count += 1
 
-wscale = 10
-wgender = 0
-result = genXYplot(wgender, wscale)
+# wscale = 10
+# wgender = 0
+# result = genXYplot(wgender, wscale)
 # genXYplot()
 # Yrange = findMaxnMin(result, len(catagory))
 # drawplot(result, catagory, t_head[4:], Yrange, len(catagory), wscale)
+# 0.8-1.2
+# genVolcanoplot()
+# genBeeSwarm()
+genVolcanoplot()

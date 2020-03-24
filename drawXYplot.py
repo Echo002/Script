@@ -10,8 +10,8 @@ from openpyxl import load_workbook
 from scipy import stats
 from scipy.stats import pearsonr
 
-input_name = r'.\inputFile\indu.xlsx'
-output_name = r'411ALL.xlsx'
+input_name = r'CKD_ADMA_dealed.xlsx'
+output_name = r'CKD_result.xlsx'
 try:
     t = pd.DataFrame(pd.read_excel(input_name))  # header = 1 表示从第一行开始
 except FileNotFoundError:
